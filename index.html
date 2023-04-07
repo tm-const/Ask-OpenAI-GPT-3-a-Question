@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>OpenAI GPT-3 Example</title>
+    
+    <!-- Axios library -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <!-- OpenAI API -->
+    <script src="https://cdn.jsdelivr.net/npm/@openai/api@0.7.0/build/web.min.js"></script>
+  </head>
+  <body>
+    <h1>Ask OpenAI GPT-3 a Question</h1>
+    <form>
+      <label for="prompt">Prompt:</label>
+      <input type="text" id="prompt" name="prompt"><br>
+      <button type="submit">Submit</button>
+    </form>
+    <br>
+    <h2>Response:</h2>
+    <p id="response"></p>
+
+    <script>
+      // Your API key from the OpenAI dashboard
+      const apiKey = 'api_key';
+
+      // The endpoint for the OpenAI API
+      const apiUrl = 'https://api.openai.com/v1/engines/davinci/completions';
+
+      // Get references to the form and response elements
+      const form = document.querySelector('form');
+      const responseElement = document.querySelector('#response');
+
+      // Add an event listener to the form to submit a request to the OpenAI API
+      form.addEventListener('submit', async (event) => {
+        // Prevent the default form submission behavior
+        event.preventDefault();
+
+        // Get the value of the prompt input
+        const prompt = document.querySelector('#prompt').value;
+
+        try {
+          // Make a request to the OpenAI API
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+              prompt,
+              max_tokens: 128,
+              n: 1,
+              stop: ['\n'],
+              temperature: 1.0
+            })
+          });
+
+          // Throw an error if the API responds with an error
+          if (!response.ok) {
+            throw new Error('Failed to retrieve response from OpenAI API');
+          }
+
+          // Get the JSON response from the OpenAI API
+          const jsonResponse = await response.json();
+
+          // Get the first response from the JSON response
+          const answer = jsonResponse.choices[0].text;
+
+          // Set the response element text to the answer
+          responseElement.innerText = answer;
+        } catch (error) {
+          // Log any errors to the console
+          console.error(error);
+          responseElement.innerText = 'An error occurred while retrieving the response. Please try again later.';
+        }
+      });
+    </script>
+  </body>
+</html>
